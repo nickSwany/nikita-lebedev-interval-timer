@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">nikita-lebedev-interval-timer</string>
+    <string name="title">Интервальный \nтаймер</string>
+    <string name="subtitle">Введите ID тренировки для загрузки программы интервалов</string>
+    <string name="id_train">ID тренировки</string>
+    <string name="retry">Повторить</string>
+    <string name="loading">Загрузка</string>
+    <string name="wait_loading">Загрузка...</string>
+    <string name="error">Тренировка не найдена. Проверьте ID</string>
+    <string name="time_icon">Time icon</string>
+    <string name="error_icon">Error icon</string>
 </resources>
