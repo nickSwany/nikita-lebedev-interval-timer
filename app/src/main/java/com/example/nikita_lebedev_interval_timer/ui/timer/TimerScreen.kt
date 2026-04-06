@@ -165,11 +165,58 @@ fun TimerScreenContent(
                     color = TextPrimary
                 )
 
-                Text(
-                    text = formateTime(timer.totalTime),
-                    style = AppTypography.caption,
-                    color = TextSecondary
-                )
+                when (timerState) {
+                    TimerUiState.Completed -> {
+                        Text(
+                            text = stringResource(R.string.completed),
+                            style = AppTypography.caption,
+                            color = Secondary
+                        )
+                    }
+
+                    TimerUiState.Idle -> {
+                        Text(
+                            text = formateTime(timer.totalTime),
+                            style = AppTypography.caption,
+                            color = TextSecondary
+                        )
+                    }
+
+                    is TimerUiState.Paused -> {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_pause),
+                                contentDescription = null,
+                                tint = Orange,
+                                modifier = Modifier.size(14.dp)
+                            )
+                            Spacer(modifier = Modifier.width(Spacing.xs))
+
+                            Text(
+                                text = stringResource(R.string.pause),
+                                style = AppTypography.caption,
+                                color = Orange
+                            )
+                        }
+                    }
+
+                    is TimerUiState.Running -> {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(
+                                modifier = Modifier
+                                    .size(8.dp)
+                                    .background(Primary, shape = CircleShape)
+                            )
+                            Spacer(modifier = Modifier.width(Spacing.xs))
+
+                            Text(
+                                text = formateTime(timerState.spentTime),
+                                style = AppTypography.caption,
+                                color = Primary
+                            )
+                        }
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(Spacing.xl))
