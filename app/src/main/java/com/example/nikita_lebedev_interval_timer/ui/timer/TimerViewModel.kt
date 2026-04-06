@@ -16,7 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TimerViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
+    private val timerSoundsPlayer: TimerSoundsPlayer
 ) : ViewModel() {
 
     private val timer: Timer = savedStateHandle.get<String>("timerJson")?.let {
@@ -32,9 +33,15 @@ class TimerViewModel @Inject constructor(
     private var timerJob: Job? = null
     private var startTimer: Long = 0L
     private var pausedTimer: Long = 0L
+    private var lastIntervalIndex: Int = -1
+    private var isSoundPlayed: Boolean = false
 
     fun start() {
         startTimer = System.currentTimeMillis() - pausedTimer * 1000
+        if (!isSoundPlayed) {
+            timerSoundsPlayer.playOneTime()
+            isSoundPlayed = true
+        }
         startTicking()
     }
 
@@ -58,6 +65,8 @@ class TimerViewModel @Inject constructor(
     fun reset() {
         timerJob?.cancel()
         pausedTimer = 0L
+        lastIntervalIndex = -1
+        isSoundPlayed = false
         _uiState.value = TimerUiState.Idle
     }
 
@@ -81,12 +90,19 @@ class TimerViewModel @Inject constructor(
         if (elapsedTime >= timer.totalTime) {
             timerJob?.cancel()
             _uiState.value = TimerUiState.Completed
+            viewModelScope.launch {
+                timerSoundsPlayer.playTwice()
+            }
             return
         }
         var accumulated = 0L
         for ((index, interval) in timer.intervals.withIndex()) {
             if (elapsedTime < accumulated + interval.time) {
                 val remaining = accumulated + interval.time - elapsedTime
+                if (index != lastIntervalIndex && lastIntervalIndex != -1) {
+                    timerSoundsPlayer.playOneTime()
+                }
+                lastIntervalIndex = index
                 _uiState.value = TimerUiState.Running(
                     activeIntervalIndex = index,
                     timeToEndInterval = remaining,
@@ -102,6 +118,4 @@ class TimerViewModel @Inject constructor(
         super.onCleared()
         timerJob?.cancel()
     }
-
-
 }

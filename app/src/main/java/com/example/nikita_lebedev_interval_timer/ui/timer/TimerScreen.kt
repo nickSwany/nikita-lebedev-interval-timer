@@ -246,7 +246,7 @@ fun TimerScreenContent(
 
                     CompleteStatusCard(
                         value = timer.intervals.size.toString(),
-                        title = "Интервалов"
+                        title = stringResource(R.string.interval)
                     )
                 }
             }
@@ -267,7 +267,12 @@ fun TimerScreenContent(
                     TimerUiState.Completed -> {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
-                                text = "${timer.intervals.size} из ${timer.intervals.size}",
+                                text = stringResource(
+                                    R.string.
+                                    one_from_two,
+                                    timer.intervals.size,
+                                    timer.intervals.size
+                                ),
                                 style = AppTypography.caption,
                                 color = TextTertiary
                             )
@@ -283,7 +288,7 @@ fun TimerScreenContent(
 
                     TimerUiState.Idle -> {
                         Text(
-                            text = "${timer.intervals.size} интервалов",
+                            text = stringResource(R.string.count_intervals, timer.intervals.size),
                             style = AppTypography.caption,
                             color = TextTertiary
                         )
@@ -291,7 +296,11 @@ fun TimerScreenContent(
 
                     is TimerUiState.Paused -> {
                         Text(
-                            text = "${timerState.activeIntervalIndex + 1} из ${timer.intervals.size}",
+                            text = stringResource(
+                                R.string.one_from_two,
+                                timerState.activeIntervalIndex + 1,
+                                timer.intervals.size
+                            ),
                             style = AppTypography.caption,
                             color = TextTertiary
                         )
@@ -299,7 +308,11 @@ fun TimerScreenContent(
 
                     is TimerUiState.Running -> {
                         Text(
-                            text = "${timerState.activeIntervalIndex + 1} из ${timer.intervals.size}",
+                            text = stringResource(
+                                R.string.one_from_two,
+                                timerState.activeIntervalIndex + 1,
+                                timer.intervals.size
+                            ),
                             style = AppTypography.caption,
                             color = TextTertiary
                         )
@@ -311,7 +324,7 @@ fun TimerScreenContent(
             Box(modifier = Modifier.weight(1f)) {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(Spacing.s)
+                    verticalArrangement = Arrangement.spacedBy(Spacing.xs)
                 ) {
                     itemsIndexed(timer.intervals) { index, interval ->
                         val itemState = getIntervalItemState(index, timerState)
@@ -463,6 +476,8 @@ fun TimeCard(
                 color = if (timerState == TimerUiState.Completed) Secondary else TextSecondary
             )
 
+            Spacer(modifier = Modifier.height(Spacing.s))
+
             Text(
                 text = remainingTime,
                 style = AppTypography.timerDisplay,
@@ -472,7 +487,11 @@ fun TimeCard(
             when (timerState) {
                 TimerUiState.Completed -> {
                     Text(
-                        text = "$totalTime из $totalTime",
+                        text = stringResource(
+                            R.string.totaltime_from_totaltime,
+                            formateTime(totalTime),
+                            formateTime(totalTime)
+                        ),
                         style = AppTypography.caption,
                         color = TextTertiary
                     )
@@ -488,32 +507,44 @@ fun TimeCard(
 
                 is TimerUiState.Paused, is TimerUiState.Running -> {
                     Text(
-                        text = "Прошло $elapsedTime из ${formateTime(totalTime)}",
+                        text = stringResource(
+                            R.string.spenttime_from_totaltime,
+                            elapsedTime,
+                            formateTime(totalTime)
+                        ),
                         style = AppTypography.caption,
                         color = TextTertiary
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(Spacing.m))
+            Spacer(modifier = Modifier.height(Spacing.l))
 
-            LinearProgressIndicator(
-                progress = {
-                    when (timerState) {
-                        TimerUiState.Completed -> 1f
-                        TimerUiState.Idle -> 0f
-                        is TimerUiState.Paused -> timerState.spentTime.toFloat() / totalTime.toFloat()
-                        is TimerUiState.Running -> timerState.spentTime.toFloat() / totalTime.toFloat()
-                    }
-                },
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(4.dp)
-                    .clip(RoundedCornerShape(2.dp)),
-                color = progressColor,
-                trackColor = Bg,
-                drawStopIndicator = {}
-            )
+                    .background(Bg, shape = RoundedCornerShape(2.dp))
+                    .clip(RoundedCornerShape(2.dp))
+            ) {
+                LinearProgressIndicator(
+                    progress = {
+                        when (timerState) {
+                            TimerUiState.Completed -> 1f
+                            TimerUiState.Idle -> 0f
+                            is TimerUiState.Paused -> timerState.spentTime.toFloat() / totalTime.toFloat()
+                            is TimerUiState.Running -> timerState.spentTime.toFloat() / totalTime.toFloat()
+                        }.coerceIn(0f,1f)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(4.dp)
+                        .clip(RoundedCornerShape(2.dp)),
+                    color = progressColor,
+                    trackColor = Bg,
+                    drawStopIndicator = {}
+                )
+            }
         }
     }
 }
@@ -583,7 +614,6 @@ fun IntervalItem(
             }
         }
 
-
         IntervalItemState.Idle -> {
             Box(
                 modifier = Modifier
@@ -601,7 +631,6 @@ fun IntervalItem(
         }
     }
 }
-
 
 @Composable
 fun IntervalItemContent(
@@ -653,7 +682,7 @@ fun IntervalItemContent(
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_check),
-                        contentDescription = "Done",
+                        contentDescription = null,
                         tint = Secondary,
                         modifier = Modifier.size(16.dp)
                     )
@@ -668,7 +697,7 @@ fun IntervalItemContent(
             style = AppTypography.caption,
             color = if (state == IntervalItemState.Completed) TextTertiary else TextPrimary,
             textDecoration = if (state == IntervalItemState.Completed) TextDecoration.LineThrough else null,
-            modifier = Modifier.weight(1f) //Возможно это лишнее
+            modifier = Modifier.weight(1f)
         )
 
         Text(
@@ -773,7 +802,7 @@ fun TimerButton(
                 ) {
 
                     Text(
-                        text = "Новая тренировка",
+                        text = stringResource(R.string.new_training),
                         style = AppTypography.button,
                         color = TextSecondary
                     )
@@ -796,7 +825,7 @@ fun TimerButton(
                 ) {
 
                     Text(
-                        text = "Сбросить тренировку",
+                        text = stringResource(R.string.reset_training),
                         style = AppTypography.button,
                         color = Error
                     )
