@@ -9,4 +9,17 @@
     <string name="error">Тренировка не найдена. Проверьте ID</string>
     <string name="time_icon">Time icon</string>
     <string name="error_icon">Error icon</string>
+    <string name="back_icon">Back icon</string>
+    <string name="Intervals">Интервалы</string>
+    <string name="start">Старт</string>
+    <string name="resume">Продолжить</string>
+    <string name="pause">Пауза</string>
+    <string name="restart">Запустить заново</string>
+    <string name="total_time">Общее время</string>
+    <string name="great_job">Отличная работа!</string>
+    <string name="onpause">НА ПАУЗЕ</string>
+    <string name="ready_to_start">ГОТОВО К СТАРТУ</string>
+    <string name="training_completed">ТРЕНИРОВКА ЗАВЕРШЕНА</string>
+    <string name="running">ВЫПОЛНЯЕТСЯ</string>
+    <string name="zero_time">0:00</string>
 </resources>
