@@ -1,4 +1,4 @@
-package com.example.nikita_lebedev_interval_timer
+package com.example.nikita_lebedev_interval_timer.ui
 
 import android.net.Uri
 import android.os.Bundle
@@ -37,7 +37,9 @@ class MainActivity : ComponentActivity() {
                     }
                     composable(
                         route = "timer/{timerJson}",
-                        arguments = listOf(navArgument("timerJson") { type = NavType.StringType })
+                        arguments = listOf(navArgument("timerJson") {
+                            type = NavType.Companion.StringType
+                        })
                     ) {
                         TimerScreen(navController = navController)
                     }
