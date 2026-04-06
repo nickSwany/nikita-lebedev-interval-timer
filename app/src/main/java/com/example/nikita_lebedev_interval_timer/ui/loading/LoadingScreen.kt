@@ -109,8 +109,8 @@ fun LoadingContent(
 
             Box(
                 modifier = Modifier
-                    .size(52.dp)
-                    .background(Primary, shape = RoundedCornerShape(12.dp)),
+                    .size(64.dp)
+                    .background(Primary, shape = RoundedCornerShape(16.dp)),
                 contentAlignment = Alignment.Center
             ) {
 
@@ -118,7 +118,7 @@ fun LoadingContent(
                     painter = painterResource(id = R.drawable.ic_timer),
                     contentDescription = stringResource(R.string.time_icon),
                     tint = Surface,
-                    modifier = Modifier.size(28.dp)
+                    modifier = Modifier.size(34.dp)
                 )
             }
 
@@ -142,7 +142,7 @@ fun LoadingContent(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(Spacing.l))
+            Spacer(modifier = Modifier.height(Spacing.xxxl))
 
             Text(
                 text = stringResource(R.string.id_train),
@@ -181,7 +181,7 @@ fun LoadingContent(
                         painter = painterResource(id = R.drawable.ic_error),
                         contentDescription = stringResource(R.string.error_icon),
                         tint = Error,
-                        modifier = Modifier.size(14.dp) // сверить со спецификацией
+                        modifier = Modifier.size(14.dp)
                     )
 
                     Spacer(modifier = Modifier.width(Spacing.xs))
