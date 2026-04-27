@@ -30,4 +30,5 @@
     <string name="reset_training">Сбросить тренировку</string>
     <string name="new_training">Новая тренировка</string>
     <string name="totaltime_from_totaltime">%1$s из %2$s</string>
+    <string name="downStream">Обратный отсчет...</string>
 </resources>

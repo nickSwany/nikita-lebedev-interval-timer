@@ -114,6 +114,19 @@ class TimerViewModel @Inject constructor(
         }
     }
 
+     fun startDownTimer() {
+
+        viewModelScope.launch {
+            for (i in 3 downTo 1) {
+                _uiState.value = TimerUiState.DownTimer(i.toString() )
+               delay(1000)
+            }
+            start()
+        }
+
+    }
+
+
     override fun onCleared() {
         super.onCleared()
         timerJob?.cancel()

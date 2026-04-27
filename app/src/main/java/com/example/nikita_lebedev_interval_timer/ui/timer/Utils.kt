@@ -11,6 +11,8 @@ fun getIntervalItemState(index: Int, timerState: TimerUiState): IntervalItemStat
     return when (timerState) {
         TimerUiState.Completed -> IntervalItemState.Completed
 
+        is TimerUiState.DownTimer -> IntervalItemState.Idle
+
         TimerUiState.Idle -> {
             if (index == 0) {
                 IntervalItemState.Active

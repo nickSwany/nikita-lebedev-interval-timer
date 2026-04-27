@@ -15,4 +15,6 @@ sealed class TimerUiState {
     ) : TimerUiState()
 
     object Completed : TimerUiState()
+
+    data class DownTimer(val timer: String) : TimerUiState()
 }
