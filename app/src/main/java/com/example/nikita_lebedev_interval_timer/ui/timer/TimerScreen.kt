@@ -79,12 +79,12 @@ fun TimerScreen(
         timer = viewModel.timerData,
         timerState = uiState,
         navController = navController,
-        onStart = viewModel::start,
+        onStart = viewModel::startDownTimer,
         onPause = viewModel::pause,
         onResume = viewModel::resume,
         onRestart = viewModel::restart,
         onReset = viewModel::reset,
-        onNewTraining = { navController.popBackStack() }
+        onNewTraining = { navController.popBackStack() },
     )
 }
 
@@ -109,6 +109,8 @@ fun TimerScreenContent(
 
         is TimerUiState.Running -> timer.intervals.getOrNull(timerState.activeIntervalIndex)?.title
             ?: ""
+
+        else -> ""
     }
 
     val remainingTime = when (timerState) {
@@ -116,6 +118,7 @@ fun TimerScreenContent(
         TimerUiState.Idle -> formateTime(timer.totalTime)
         is TimerUiState.Paused -> formateTime(timerState.timeToEndInterval)
         is TimerUiState.Running -> formateTime(timerState.timeToEndInterval)
+        else -> ""
     }
 
     val elapsedTime = when (timerState) {
@@ -123,6 +126,7 @@ fun TimerScreenContent(
         TimerUiState.Idle -> ""
         is TimerUiState.Paused -> formateTime(timerState.spentTime)
         is TimerUiState.Running -> formateTime(timerState.spentTime)
+        else -> ""
     }
 
     Column(
@@ -174,7 +178,7 @@ fun TimerScreenContent(
                         )
                     }
 
-                    TimerUiState.Idle -> {
+                    TimerUiState.Idle, is TimerUiState.DownTimer -> {
                         Text(
                             text = formateTime(timer.totalTime),
                             style = AppTypography.caption,
@@ -216,6 +220,7 @@ fun TimerScreenContent(
                             )
                         }
                     }
+
                 }
             }
 
@@ -268,8 +273,7 @@ fun TimerScreenContent(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
                                 text = stringResource(
-                                    R.string.
-                                    one_from_two,
+                                    R.string.one_from_two,
                                     timer.intervals.size,
                                     timer.intervals.size
                                 ),
@@ -317,6 +321,8 @@ fun TimerScreenContent(
                             color = TextTertiary
                         )
                     }
+
+                    else -> {}
                 }
             }
 
@@ -374,7 +380,7 @@ fun TimerScreenContent(
                 onResume = onResume,
                 onRestart = onRestart,
                 onReset = onReset,
-                onNewTraining = onNewTraining
+                onNewTraining = onNewTraining,
             )
         }
     }
@@ -391,7 +397,7 @@ fun TimeCard(
 
     val borderColor = when (timerState) {
         TimerUiState.Completed -> SecondaryLight
-        TimerUiState.Idle -> Border
+        TimerUiState.Idle, is TimerUiState.DownTimer -> Border
         is TimerUiState.Paused -> OrangeLight
         is TimerUiState.Running -> PrimaryLight
     }
@@ -401,6 +407,7 @@ fun TimeCard(
         TimerUiState.Idle -> stringResource(R.string.ready_to_start)
         is TimerUiState.Paused -> stringResource(R.string.onpause)
         is TimerUiState.Running -> stringResource(R.string.running)
+        is TimerUiState.DownTimer -> stringResource(R.string.downStream)
     }
 
     val stateColor = when (timerState) {
@@ -408,6 +415,7 @@ fun TimeCard(
         TimerUiState.Idle -> TextTertiary
         is TimerUiState.Paused -> Orange
         is TimerUiState.Running -> Primary
+        else -> Primary
     }
 
     val timeColor = when (timerState) {
@@ -415,6 +423,7 @@ fun TimeCard(
         TimerUiState.Idle -> TextPrimary
         is TimerUiState.Paused -> Orange
         is TimerUiState.Running -> Primary
+        is TimerUiState.DownTimer -> Primary
     }
 
     val progressColor = when (timerState) {
@@ -422,6 +431,7 @@ fun TimeCard(
         TimerUiState.Idle -> Primary
         is TimerUiState.Paused -> Orange
         is TimerUiState.Running -> Primary
+        else -> Primary
     }
 
     val gradientBrush = when (timerState) {
@@ -438,6 +448,12 @@ fun TimeCard(
         is TimerUiState.Running -> Brush.verticalGradient(
             colors = listOf(PrimaryGradient, Color.Transparent)
         )
+
+        else -> {
+            Brush.verticalGradient(
+                colors = listOf(PrimaryGradient, Color.Transparent)
+            )
+        }
     }
 
     Box(
@@ -478,11 +494,25 @@ fun TimeCard(
 
             Spacer(modifier = Modifier.height(Spacing.s))
 
-            Text(
-                text = remainingTime,
-                style = AppTypography.timerDisplay,
-                color = timeColor
-            )
+            when (timerState) {
+                is TimerUiState.DownTimer -> {
+                    Text(
+                        text = timerState.timer,
+                        style = AppTypography.timerDisplay,
+                        color = timeColor
+                    )
+                }
+
+                else -> {
+                    Text(
+                        text = remainingTime,
+                        style = AppTypography.timerDisplay,
+                        color = timeColor
+                    )
+                }
+            }
+
+
 
             when (timerState) {
                 TimerUiState.Completed -> {
@@ -516,6 +546,8 @@ fun TimeCard(
                         color = TextTertiary
                     )
                 }
+
+                else -> {}
             }
 
             Spacer(modifier = Modifier.height(Spacing.l))
@@ -531,10 +563,10 @@ fun TimeCard(
                     progress = {
                         when (timerState) {
                             TimerUiState.Completed -> 1f
-                            TimerUiState.Idle -> 0f
+                            TimerUiState.Idle, is TimerUiState.DownTimer -> 0f
                             is TimerUiState.Paused -> timerState.spentTime.toFloat() / totalTime.toFloat()
                             is TimerUiState.Running -> timerState.spentTime.toFloat() / totalTime.toFloat()
-                        }.coerceIn(0f,1f)
+                        }.coerceIn(0f, 1f)
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -726,28 +758,28 @@ fun TimerButton(
 
     val eventOnClick = when (timerState) {
         TimerUiState.Completed -> onRestart
-        TimerUiState.Idle -> onStart
+        TimerUiState.Idle, is TimerUiState.DownTimer -> onStart
         is TimerUiState.Paused -> onResume
         is TimerUiState.Running -> onPause
     }
 
     val backColor = when (timerState) {
         TimerUiState.Completed -> Secondary
-        TimerUiState.Idle -> Primary
+        TimerUiState.Idle, TimerUiState.Idle, is TimerUiState.DownTimer -> Primary
         is TimerUiState.Paused -> Primary
         is TimerUiState.Running -> Orange
     }
 
     val textButton = when (timerState) {
         TimerUiState.Completed -> stringResource(R.string.restart)
-        TimerUiState.Idle -> stringResource(R.string.start)
+        TimerUiState.Idle, is TimerUiState.DownTimer -> stringResource(R.string.start)
         is TimerUiState.Paused -> stringResource(R.string.resume)
         is TimerUiState.Running -> stringResource(R.string.pause)
     }
 
     val iconButton = when (timerState) {
         TimerUiState.Completed -> painterResource(R.drawable.ic_restart)
-        TimerUiState.Idle -> painterResource(R.drawable.ic_start)
+        TimerUiState.Idle, is TimerUiState.DownTimer -> painterResource(R.drawable.ic_start)
         is TimerUiState.Paused -> painterResource(R.drawable.ic_start)
         is TimerUiState.Running -> painterResource(R.drawable.ic_pause)
     }
